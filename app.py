@@ -59,6 +59,12 @@ def format_date(value) -> str:
         return str(value)
 
 
+def format_bool(value) -> str:
+    if pd.isna(value):
+        return "n/a"
+    return "Ja" if bool(value) else "Nein"
+
+
 def poster_url(path_value: Optional[str]) -> Optional[str]:
     if not path_value or pd.isna(path_value):
         return None
@@ -71,32 +77,23 @@ def poster_url(path_value: Optional[str]) -> Optional[str]:
 # -----------------------------
 # Database connection
 # -----------------------------
-@st.cache_resource
-def get_connection():
-    database_url = None
-
+def get_database_url() -> str:
     try:
         database_url = st.secrets["DATABASE_URL"]
     except Exception:
         database_url = os.getenv("DATABASE_URL")
 
-    if database_url:
-        return psycopg2.connect(database_url)
+    if not database_url:
+        raise ValueError("DATABASE_URL not found in Streamlit secrets or environment variables.")
 
-    return psycopg2.connect(
-        host=os.getenv("PGHOST", "localhost"),
-        port=os.getenv("PGPORT", "5432"),
-        dbname=os.getenv("PGDATABASE", "postgres"),
-        user=os.getenv("PGUSER", "postgres"),
-        password=os.getenv("PGPASSWORD", "postgres"),
-        sslmode=os.getenv("PGSSLMODE", "prefer"),
-    )
+    return database_url
 
 
 @st.cache_data(ttl=300)
 def run_query(query: str, params: Optional[tuple] = None) -> pd.DataFrame:
-    conn = get_connection()
-    return pd.read_sql_query(query, conn, params=params)
+    database_url = get_database_url()
+    with psycopg2.connect(database_url) as conn:
+        return pd.read_sql_query(query, conn, params=params)
 
 
 # -----------------------------
@@ -176,7 +173,7 @@ def show_film_database_page() -> None:
             m.vote_average,
             m.vote_count,
             m.popularity,
-            rm.poster_path,
+            m.poster_path,
             EXTRACT(YEAR FROM NULLIF(m.release_date, '')::date) AS release_year,
             EXISTS (
                 SELECT 1
@@ -184,8 +181,6 @@ def show_film_database_page() -> None:
                 WHERE r.movie_id = m.movie_id
             ) AS has_reviews
         FROM core.movies m
-        LEFT JOIN raw.movies rm
-            ON m.movie_id = rm.id
         LEFT JOIN core.movie_genres mg
             ON m.movie_id = mg.movie_id
         LEFT JOIN core.genres g
@@ -212,7 +207,7 @@ def show_film_database_page() -> None:
           )
           AND (
               %s = FALSE
-              OR (rm.poster_path IS NOT NULL AND rm.poster_path <> '')
+              OR (m.poster_path IS NOT NULL AND m.poster_path <> '')
           )
         ORDER BY {sort_column} {sort_direction} NULLS LAST, m.title ASC
         LIMIT {results_limit};
@@ -362,21 +357,19 @@ def show_film_database_page() -> None:
             m.vote_average,
             m.vote_count,
             m.popularity,
-            rm.original_title,
-            rm.overview,
-            rm.poster_path,
-            rm.backdrop_path,
-            rm.status,
-            rm.tagline,
-            rm.homepage,
-            rm.original_language,
-            rm.adult,
-            rm.video,
-            rm.created_at,
-            rm.updated_at
+            m.original_title,
+            m.overview,
+            m.poster_path,
+            m.backdrop_path,
+            m.status,
+            m.tagline,
+            m.homepage,
+            m.original_language,
+            m.adult,
+            m.video,
+            m.created_at,
+            m.updated_at
         FROM core.movies m
-        LEFT JOIN raw.movies rm
-            ON m.movie_id = rm.id
         WHERE m.movie_id = %s;
     """
 
@@ -502,8 +495,8 @@ def show_film_database_page() -> None:
                     movie.get("movie_id"),
                     movie.get("original_language") if pd.notna(movie.get("original_language")) else "n/a",
                     movie.get("status") if pd.notna(movie.get("status")) else "n/a",
-                    movie.get("adult") if pd.notna(movie.get("adult")) else "n/a",
-                    movie.get("video") if pd.notna(movie.get("video")) else "n/a",
+                    format_bool(movie.get("adult")),
+                    format_bool(movie.get("video")),
                     movie.get("created_at") if pd.notna(movie.get("created_at")) else "n/a",
                     movie.get("updated_at") if pd.notna(movie.get("updated_at")) else "n/a",
                 ],
@@ -586,7 +579,9 @@ def show_film_database_page() -> None:
     if "release_year" in display_results.columns:
         display_results["release_year"] = display_results["release_year"].astype("Int64")
 
-    display_results["Poster"] = display_results["poster_path"].apply(lambda x: "Ja" if pd.notna(x) and str(x).strip() else "Nein")
+    display_results["Poster"] = display_results["poster_path"].apply(
+        lambda x: "Ja" if pd.notna(x) and str(x).strip() else "Nein"
+    )
     display_results["Reviews"] = display_results["has_reviews"].apply(lambda x: "Ja" if bool(x) else "Nein")
     display_results["Budget"] = display_results["budget"].apply(format_money)
     display_results["Revenue"] = display_results["revenue"].apply(format_money)
