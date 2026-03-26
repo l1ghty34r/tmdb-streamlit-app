@@ -1,68 +1,55 @@
 🎬 TMDB Movie Analytics App
 
-Interaktive Streamlit-App zur Analyse von Filmdaten mit Fokus auf Exploration, Empfehlungssysteme und ROI-Bewertung.
+Interactive Streamlit app for analyzing movie data, with a focus on exploration, recommendation systems, and ROI evaluation.
 
-👉 Live Demo: [Hier deinen Streamlit-Link einfügen]
+👉 Live Demo: https://tmdb-app-app-7fq2yqkxrpknmdkg4b7nqq.streamlit.app/
 
 🚀 Features
 
 🔍 Movie Database
-Suche und Filter nach Filmen (Genre, Cast, Director etc.)
-Detailansicht mit allen relevanten Informationen
-Übersichtliche Darstellung von Reviews und Metadaten
+Search and filter movies (genre, cast, director, etc.)
+Detailed view with all relevant information
+Clear presentation of reviews and metadata
 
 🎯 Recommendation Engine
-Content-basierter Recommender auf Basis von Film-Metadaten
-Umstellung von CountVectorizer auf TF-IDF, um irrelevante Begriffe zu reduzieren und die Qualität der Empfehlungen zu verbessern
-Berechnung von Ähnlichkeiten zwischen Filmen zur Generierung von Empfehlungen
+Content-based recommender based on movie metadata
+Switched from CountVectorizer to TF-IDF to reduce less relevant terms and improve recommendation quality
+Computes similarities between movies to generate recommendations
 
 📈 ROI Builder
-Berechnung eines erwarteten ROI basierend auf:
-Schauspielern
-Regisseuren
+Calculates an expected ROI based on:
+Actors
+Directors
 Genres
-Ziel: datenbasierte Einschätzung, welche Kombinationen potenziell erfolgreich sein könnten
-Hinweis: Marketingkosten sind nicht im Budget enthalten → ROI tendenziell höher als in der Realität
+Goal: provide a data-driven estimation of potentially successful combinations
+Note: Marketing costs are not included → ROI tends to be higher than in reality
 
 🧠 Tech Stack
 Python (Pandas, NumPy, Scikit-learn)
-SQL / PostgreSQL (gehostet über Neon)
-Streamlit (Frontend & Deployment)
-Machine Learning (leichtgewichtig):
-TF-IDF zur Feature-Gewichtung
-Cosine Similarity für Empfehlungen
+SQL / PostgreSQL (hosted on Neon)
+Streamlit (frontend & deployment)
+Lightweight Machine Learning:
+TF-IDF for feature weighting
+Cosine similarity for recommendations
 
-🗄️ Datenbasis
-Datensatz: The Movie Database (TMDB) – Kaggle
-Daten wurden:
-bereinigt (Missing Values, Datentypen etc.)
-normalisiert (eigene Core-Tabellen in PostgreSQL)
-für Analyse und App-Nutzung optimiert
+🗄️ Data Source
+Dataset: The Movie Database (TMDB) – Kaggle
+Data processing included:
+Cleaning (missing values, data types, etc.)
+Normalization (custom core tables in PostgreSQL)
+Optimization for analysis and app usage
 
-⚙️ Setup (lokal)
-git clone <dein-repo-link>
+⚙️ Setup (Local)
+git clone <your-repo-link>
 cd tmdb-streamlit-app
 pip install -r requirements.txt
 streamlit run app.py
 
-🧩 Projektstruktur
+🧩 Project Structure
 tmdb-streamlit-app/
 │
 ├── app.py
 ├── pages/
-├── notebooks/        # Datenbereinigung & Exploration
+├── notebooks/        # data cleaning & exploration
 ├── requirements.txt
 ├── README.md
-
-🎯 Ziel des Projekts
-
-Ziel war es, eine End-to-End Data Application zu entwickeln:
-
-Datenaufbereitung (Python + SQL)
-Datenmodellierung (PostgreSQL)
-Analyse & Feature Engineering
-Umsetzung als interaktive Anwendung (Streamlit)
-💡 Weiterentwicklung (optional)
-Erweiterung um echte Machine-Learning-Modelle (z. B. Regression für ROI)
-Integration von User-Ratings für Hybrid-Recommender
-Deployment mit Docker
