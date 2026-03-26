@@ -3,7 +3,7 @@
 Interactive Streamlit app for analyzing movie data, with a focus on exploration, recommendation systems, and ROI evaluation.
 
 👉 **Live Demo:**  
-https://tmdb-app-app-7fq2ygkxrpkmndkg4b7nqq.streamlit.app/
+https://tmdb-app-app-7fq2yqkxrpknmdkg4b7nqq.streamlit.app/
 
 ---
 
