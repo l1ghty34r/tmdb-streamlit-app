@@ -130,8 +130,8 @@ def show_movie_database_page() -> None:
         st.warning("No results found. Adjust the filters or broaden the search.")
         return
 
-    st.markdown("### Quick Selection")
-    st.caption("Compact preview of the current results. Select a movie below for the detail view.")
+    st.markdown("### Most popular")
+    st.caption("These are the most popular movies based on your criteria. Select a movie below for the detail view.")
 
     if "selected_movie_id" not in st.session_state:
         st.session_state["selected_movie_id"] = None
@@ -225,7 +225,7 @@ def show_movie_database_page() -> None:
     default_index = movie_labels.index(label_by_id[default_movie_id])
 
     selected_label = st.selectbox(
-        "Or select a movie directly from the result list",
+        "Select a movie to view details:",
         movie_labels,
         index=default_index,
     )
