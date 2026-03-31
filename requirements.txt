@@ -1,5 +1,6 @@
 streamlit
 pandas
 numpy
-psycopg2-binary
 scikit-learn
+joblib
+psycopg2-binary
